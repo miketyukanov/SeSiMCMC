@@ -17,13 +17,13 @@ $Id: StupidTest.cpp 1014 2009-03-01 16:50:36Z favorov $
 
 using namespace std;
 
-#include "Sequences.hpp"
-#include "MarkovChainState.hpp"
-#include "KullbakCounter.hpp"
+#include "../Sequences.hpp"
+#include "../MarkovChainState.hpp"
+#include "../KullbakCounter.hpp"
 
 extern "C"
 {
-	#include "Random.h"
+    #include "../Random.h"
 }
 
 unsigned int fake_data_positions[20]={84,81,78,75,72,69,66,63,60,50,

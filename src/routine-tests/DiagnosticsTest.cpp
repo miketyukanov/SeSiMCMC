@@ -27,7 +27,7 @@ int main(int argc, char ** argv)
 	diagnostics<<"Second line.\n";
 	diagnostics<<"Third line.\n";
 
-	diagnostics.output_mode=text_output;
+    diagnostics.output_mode=txt_output;
 	cout<<"Text:\n"<<diagnostics<<endl;
 	diagnostics.output_mode=comment_output;
 	cout<<"Comment:\n"<<diagnostics<<endl;

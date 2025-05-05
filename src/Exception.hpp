@@ -10,16 +10,15 @@ $Id$
 
 #include <iostream>
 
-using namespace std;
+
 
 struct DumbException
 {
-	const char * info;
-	DumbException(const char * str=""):info(str){};
+    std::string info;
+    DumbException(const char * str=""):info(str){}
 };
 
-inline
-ostream & operator<< (ostream & o, const DumbException & de)
+inline std::ostream & operator<< (std::ostream & o, const DumbException & de)
 {
 	o<<de.info;
 	return o;
@@ -27,12 +26,12 @@ ostream & operator<< (ostream & o, const DumbException & de)
 
 struct AtgcException : public DumbException
 {
-	AtgcException(const char * str=""):DumbException(str){};
+    AtgcException(const char * str=""):DumbException(str){}
 };
 
 struct IOStreamException : public DumbException
 {
-	IOStreamException(const char * str=""):DumbException(str){};
+    IOStreamException(const char * str=""):DumbException(str){}
 };
 
 

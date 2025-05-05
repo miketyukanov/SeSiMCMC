@@ -19,7 +19,6 @@ $Id$
 #include <stdio.h>
 #include <math.h>
 
-using namespace std;
 
 #include "Exception.hpp"
 
@@ -61,39 +60,22 @@ public:
 	static unsigned short complement(unsigned short sym);
 	static char complement(char sym);
 
-	static vector<unsigned short> & complement
-			(
-				 const vector<unsigned short> & source, 
-				 vector<unsigned short> & dest
-			); 
+    static std::vector<unsigned short> &complement(const std::vector<unsigned short> &source,
+                                                   std::vector<unsigned short> &dest);
 
-	static vector<unsigned short> & complement
-			(
-				 vector<unsigned short> & source 
-			);  //in-place version
+    static std::vector<unsigned short> &complement(
+        std::vector<unsigned short> &source); //in-place version
 
-	static string & complement
-			(
-				 const string & source, 
-				 string & dest
-			); 
+    static std::string &complement(const std::string &source, std::string &dest);
 
-	static string & complement
-			(
-				 string & dest 
-			);  //in-place version
+    static std::string &complement(std::string &dest); //in-place version
 
-	static string & atgc2string
-			(
-				 const vector<unsigned short> & source, 
-				 string & dest=*new(string)
-			);
+    static std::string &atgc2string(const std::vector<unsigned short> &source,
+                                    std::string &dest = *new(std::string));
 
-	static vector<unsigned short> & string2atgc 
-			(
-				 const string & source, 
-				 vector<unsigned short> & dest=*new (vector<unsigned short>)
-			);
+    static std::vector<unsigned short> &string2atgc(
+        const std::string &source,
+        std::vector<unsigned short> &dest = *new(std::vector<unsigned short>));
 };
 
 inline
@@ -150,8 +132,8 @@ unsigned short Atgc::atgc2ushort(char letter)
 		//we cannot define the masked symbol,
 		//whatever.
 	};
-	string message="Trying to read symbol \'";
-	message+=letter;
+    std::string message = "Trying to read symbol \'";
+    message+=letter;
 	message+="\' as nucleoutide.\n";
 	throw * new AtgcException(message.c_str());
 	return 0;
@@ -162,8 +144,8 @@ char Atgc::ushort2atgc(unsigned short symbol)
 {
 	if (symbol>MaxAtgcSymbol)
 	{
-		string message="Trying to interpret ";
-		char symb_no[10];
+        std::string message = "Trying to interpret ";
+        char symb_no[10];
 	  snprintf(symb_no,9,"%1i", symbol);	
 		message+=symb_no;
 		message+=" as an atgc number (1..4).\n";
@@ -196,27 +178,23 @@ char Atgc::complement(char sym)
 	if (a=='r') return up?toupper('y'):'y';
 	if (a=='y') return up?toupper('r'):'r';
 	if (a=='x') return up?toupper('x'):'x';
-	string message="Trying to fing complement to symbol \'";
-	message+=sym;
+    std::string message = "Trying to fing complement to symbol \'";
+    message+=sym;
 	message+="\'.\n";
 	throw * new AtgcException(message.c_str());
 	return 0;
 }
 
-inline
-vector<unsigned short> & Atgc::complement
-		(
-			 vector<unsigned short> & dest
-		)
+inline std::vector<unsigned short> &Atgc::complement(std::vector<unsigned short> &dest)
 {
 	//we do not use STL swap because it is more quick to swap and 
 	//reverse bases in one pass.
 	//on the other hand, we want the algoryth to be stable for in-place
 	//operations. the part is not time_critical.
-	vector<unsigned short>::iterator l=dest.begin();
-	vector<unsigned short>::iterator r=dest.end();
-	r--;
-	while (l<=r)
+    std::vector<unsigned short>::iterator l = dest.begin();
+    std::vector<unsigned short>::iterator r = dest.end();
+    r--;
+    while (l<=r)
 	{
 		unsigned short buf=*l;
 		*l++=complement(*r);
@@ -225,12 +203,8 @@ vector<unsigned short> & Atgc::complement
 	return dest;
 }
 
-inline
-vector<unsigned short> & Atgc::complement
-		(
-			 const vector<unsigned short> & source, 
-			 vector<unsigned short> & dest
-		)
+inline std::vector<unsigned short> &Atgc::complement(const std::vector<unsigned short> &source,
+                                                     std::vector<unsigned short> &dest)
 {
 	//we do not use STL swap because it is more quick to swap and 
 	//reverse bases in one pass.
@@ -238,26 +212,22 @@ vector<unsigned short> & Atgc::complement
 	//operations. the part is not time_critical.
 	if (&source==&dest) return complement(dest);
 	dest.clear();
-	vector<unsigned short>::const_iterator r=source.end();
-	r--;
-	while (source.begin()<=r)
+    std::vector<unsigned short>::const_iterator r = source.end();
+    r--;
+    while (source.begin()<=r)
 		dest.push_back(complement(*r--));
 	return dest;
 }
 
-inline
-string & Atgc::complement
-			(
-				 string & dest 
-			)  //in-place version
+inline std::string &Atgc::complement(std::string &dest) //in-place version
 {
 	//we do not use STL swap because it is more quick to swap and 
 	//reverse bases in one pass.
 	//on the other hand, we want the algoryth to be stable for in-place
 	//operations. the part is not time_critical.
-	string::iterator l=dest.begin();
-	string::iterator r=dest.end();
-	r--;
+    std::string::iterator l = dest.begin();
+    std::string::iterator r = dest.end();
+    r--;
 	while (l<=r)
 	{
 		char buf=*l;
@@ -267,12 +237,7 @@ string & Atgc::complement
 	return dest;
 }
 
-inline
-string & Atgc::complement
-			(
-				 const string & source, 
-				 string & dest
-			) 
+inline std::string &Atgc::complement(const std::string &source, std::string &dest)
 {
 	//we do not use STL swap because it is more quick to swap and 
 	//reverse bases in one pass.
@@ -280,38 +245,28 @@ string & Atgc::complement
 	//operations. the part is not time_critical.
 	if (&source==&dest) return complement(dest);
 	dest.erase();
-	string::const_iterator r=source.end();
-	r--;
+    std::string::const_iterator r = source.end();
+    r--;
 	while (source.begin()<=r)
 		dest.push_back(complement(*r--));
 	return dest;
 }
 
-
-inline
-string & Atgc::atgc2string
-(
-	 const vector<unsigned short> & source, 
-	 string & dest
-)	
+inline std::string &Atgc::atgc2string(const std::vector<unsigned short> &source, std::string &dest)
 {
-	dest="";
-	vector<unsigned short>::const_iterator r=source.begin();
-	while ( r!=source.end() )
-		dest.push_back(ushort2atgc(*r++));
+    dest="";
+    std::vector<unsigned short>::const_iterator r = source.begin();
+    while (r != source.end())
+        dest.push_back(ushort2atgc(*r++));
 	return dest;
 }
 
-inline
-vector<unsigned short> & Atgc::string2atgc 
-			(
-				 const string & source, 
-				 vector<unsigned short> & dest
-			) 
+inline std::vector<unsigned short> &Atgc::string2atgc(const std::string &source,
+                                                      std::vector<unsigned short> &dest)
 {
-	dest.clear();
-	string::const_iterator r=source.begin();
-	while ( r!=source.end() )
+    dest.clear();
+    std::string::const_iterator r = source.begin();
+    while ( r!=source.end() )
 		dest.push_back(atgc2ushort(*r++));
 	return dest;
 }

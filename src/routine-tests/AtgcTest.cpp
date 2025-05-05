@@ -5,16 +5,16 @@
 
 int main()
 {
-	vector<unsigned short> atgc,atgc1;
-	string str;
+    std::vector<unsigned short> atgc,atgc1;
+    std::string str;
 	str="attttaaaagcccc";
 	Atgc::string2atgc(str,atgc);
-	cout<<"Original string:\n"<<str<<endl
-			<<"Back converted:"<<Atgc::atgc2string(atgc,str)<<endl;
+    std::cout<<"Original string:\n"<<str<<std::endl
+            <<"Back converted:"<<Atgc::atgc2string(atgc,str)<<std::endl;
 	Atgc::complement(atgc,atgc1);
-	cout<<"Copy complement:"<<Atgc::atgc2string(atgc1,str)<<endl;
+    std::cout<<"Copy complement:"<<Atgc::atgc2string(atgc1,str)<<std::endl;
 	Atgc::complement(atgc);
-	cout<<"Inplace complement:"<<Atgc::atgc2string(atgc,str)<<endl;
+    std::cout<<"Inplace complement:"<<Atgc::atgc2string(atgc,str)<<std::endl;
 	Atgc::complement(atgc,atgc);
-	cout<<"One more inplace :"<<Atgc::atgc2string(atgc,str)<<endl;
+    std::cout<<"One more inplace :"<<Atgc::atgc2string(atgc,str)<<std::endl;
 }

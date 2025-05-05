@@ -8,32 +8,37 @@ $Id$
 #ifndef _DIAGNOSTICS_HPP_
 #define _DIAGNOSTICS_HPP_
 
-using namespace std;
-
 #include <sstream>
 
-typedef enum
-	{unknown_output_mode=0,txt_output,comment_output,html_output,xml_output}
-	output_mode_type;
+enum output_mode_type {
+    unknown_output_mode = 0,
+    txt_output,
+    comment_output,
+    html_output,
+    xml_output
+};
 
-typedef enum {OK,unreliable,fatal} status_type;
+enum status_type { OK, unreliable, fatal };
 
-class Diagnostics:public ostringstream
+class Diagnostics : public std::ostringstream
 {
 	Diagnostics(const Diagnostics &);
 	Diagnostics & operator=(const Diagnostics &);
 public:
-	Diagnostics():ostringstream(ostringstream::out),output_mode(txt_output),status(OK){};
-	output_mode_type output_mode;
-	status_type status;
-	void do_text_output(ostream & o) const;
-	void do_comment_output(ostream & o) const;
-	void do_html_output(ostream & o) const;
-	void do_xml_output(ostream & o) const;
+    Diagnostics()
+        : std::ostringstream(std::ostringstream::out)
+        , output_mode(txt_output)
+        , status(OK)
+    {}
+    output_mode_type output_mode;
+    status_type status;
+    void do_text_output(std::ostream &o) const;
+    void do_comment_output(std::ostream &o) const;
+    void do_html_output(std::ostream &o) const;
+    void do_xml_output(std::ostream &o) const;
 };
 
-inline
-ostream & operator << (ostream & o, const Diagnostics & d)
+inline std::ostream &operator<<(std::ostream &o, const Diagnostics &d)
 {
 	switch (d.output_mode)
 	{
@@ -46,28 +51,29 @@ ostream & operator << (ostream & o, const Diagnostics & d)
 	return o;
 }
 
-inline void Diagnostics::do_text_output(ostream &o) const
-{ 
-	auto str = ostringstream::str();
-	for(const auto& val: str) o<<val;
+inline void Diagnostics::do_text_output(std::ostream &o) const
+{
+    auto str = std::ostringstream::str();
+    for (const auto &val : str)
+        o << val;
 }
 
-inline void Diagnostics::do_comment_output(ostream &o) const
+inline void Diagnostics::do_comment_output(std::ostream &o) const
 {
 	o<<"#";
-	auto str = ostringstream::str();
-	for(const auto& val: str)
+    auto str = std::ostringstream::str();
+    for(const auto& val: str)
 	{
 		o<<val;
 		if (val == '\n') o<<"#";
 	}
 }
 
-inline void Diagnostics::do_html_output(ostream &o) const
+inline void Diagnostics::do_html_output(std::ostream &o) const
 {
 	o<<"<TT>"<<endl;
-	auto str = ostringstream::str();
-	for(const auto& val: str)
+    auto str = std::ostringstream::str();
+    for(const auto& val: str)
 	{
 		o<<val;
 		if (val == '\n') o<<"<br>\n";
@@ -75,7 +81,7 @@ inline void Diagnostics::do_html_output(ostream &o) const
 	o<<"</TT>"<<endl;
 }
 
-inline void Diagnostics::do_xml_output(ostream &o) const
+inline void Diagnostics::do_xml_output(std::ostream &o) const
 {
 	o<<"<comment name=\"diagnostics\" ";
 	switch (status)
@@ -85,8 +91,8 @@ inline void Diagnostics::do_xml_output(ostream &o) const
 	case fatal: o<<" status=\"fatal\"";break;
 	}
 	o<<">"<<endl;
-	auto str = ostringstream::str();
-	for(const auto& val: str) o<<val;
+    auto str = std::ostringstream::str();
+    for(const auto& val: str) o<<val;
 	o<<"</comment>"<<endl;
 }
 #endif /*_DIAGNOSTICS_HPP_*/
