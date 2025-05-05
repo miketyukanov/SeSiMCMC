@@ -15,7 +15,9 @@ $Id$
 struct DumbException
 {
     std::string info;
-    DumbException(const char * str=""):info(str){}
+    explicit DumbException(const char *str = "")
+        : info(str)
+    {}
 };
 
 inline std::ostream & operator<< (std::ostream & o, const DumbException & de)
@@ -26,12 +28,16 @@ inline std::ostream & operator<< (std::ostream & o, const DumbException & de)
 
 struct AtgcException : public DumbException
 {
-    AtgcException(const char * str=""):DumbException(str){}
+    explicit AtgcException(const char *str = "")
+        : DumbException(str)
+    {}
 };
 
 struct IOStreamException : public DumbException
 {
-    IOStreamException(const char * str=""):DumbException(str){}
+    explicit IOStreamException(const char *str = "")
+        : DumbException(str)
+    {}
 };
 
 
