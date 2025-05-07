@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.23)
+cmake_minimum_required(VERSION 3.27)
 
 project(SeSiMCMC VERSION 1.0)
 
@@ -8,12 +8,18 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
+add_library(SeSiMCMCLib STATIC confread.c Random.c MCMC.cpp ResultsSet.cpp
+    Sequences.cpp SymbolsCounter.cpp)
 add_executable(SeSiMCMC)
 
 set(common_SeSiSources confread.c Random.c MCMC.cpp ResultsSet.cpp
     Sequences.cpp SymbolsCounter.cpp)
-target_sources(SeSiMCMC PRIVATE ${common_SeSiSources} gibbslfm.cpp)
-target_sources(SeSiMCMC PRIVATE FILE_SET HEADERS FILES confread.h Random.h Atgc.hpp
+target_sources(SeSiMCMC PRIVATE gibbslfm.cpp)
+target_link_libraries(SeSiMCMC PRIVATE SeSiMCMCLib)
+
+define_property(TARGET PROPERTY COMMON_SESI)
+
+target_sources(SeSiMCMCLib PRIVATE FILE_SET HEADERS FILES confread.h Random.h Atgc.hpp
     Diagnostics.hpp Exception.hpp KullbakCounter.hpp Logger.hpp MarkovChainState.hpp
     MCMC.hpp RandomMappings.hpp ResultsSet.hpp Sequences.hpp SymbolsCounter.hpp)
 
@@ -43,3 +49,6 @@ target_sources(StupidTest PRIVATE ${common_SeSiSources} routine-tests/StupidTest
 
 add_executable(SymbolsCounterTest)
 target_sources(SymbolsCounterTest PRIVATE ${common_SeSiSources} routine-tests/SymbolsCounterTest.cpp)
+
+#add_subdirectory(SeSiMCMC_GTests)
+add_subdirectory(SeSiMCMC_CatchTests)

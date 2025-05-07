@@ -14,16 +14,14 @@ $Id$
 #include <iostream>
 #include <iomanip>
 
-using namespace std;
-
 #include "Exception.hpp"
 #include "SymbolsCounter.hpp"
 
 class KullbakCounter
 {
-	KullbakCounter(const KullbakCounter &);
-	KullbakCounter & operator= (const KullbakCounter &);
-	//no copy constructor, no copy operation
+    KullbakCounter(const KullbakCounter &) = delete;
+    KullbakCounter &operator=(const KullbakCounter &) = delete;
+    //no copy constructor, no copy operation
 	double entropy_threshold;
 	//maximal entropy for a "stable" position :)
 	//Pay attention: it is entropy, not IC!
