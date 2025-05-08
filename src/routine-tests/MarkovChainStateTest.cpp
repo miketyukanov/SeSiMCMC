@@ -67,9 +67,12 @@ int main(int argc, char ** argv)
 
 	try{
 		fastainput>>sp;
-	} catch(DumbException de) {cout<<de;return 5;}
-	
-	MarkovChainState state1(sp.size());
+    } catch (const DumbException &de) {
+        cout << de;
+        return 5;
+    }
+
+    MarkovChainState state1(sp.size());
 	MarkovChainState state2(sp.size());
 
 	if (mode==out)
@@ -83,8 +86,11 @@ int main(int argc, char ** argv)
 	{
 		try{
 		cin>>state1>>state2;
-		} catch(DumbException de) {cerr<<de;return 1;}
-		cout<<state1<<state2<<"Scalar product is "<<state2*state1<<endl<<
+        } catch (const DumbException &de) {
+            cerr << de;
+            return 1;
+        }
+        cout<<state1<<state2<<"Scalar product is "<<state2*state1<<endl<<
 				"Strict scalar product is "<<StrictScalarProduct(state1,state2)<<endl;
 		return 0;
 	}

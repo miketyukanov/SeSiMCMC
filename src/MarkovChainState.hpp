@@ -59,14 +59,15 @@ public:
 	{
 		if (spaced && (left != right))
 		{
-			throw (*new DumbException ("I cannot asymmetrically trim a spaced motif!\n"));
-		}
-		if (length<the_shortest_sensible_motif+right+spacer_length())
+            throw DumbException("I cannot asymmetrically trim a spaced motif!\n");
+        }
+        if (length<the_shortest_sensible_motif+right+spacer_length())
 		{
-			throw (*new DumbException ("There was an attempt to trim down to a length\nthat is less than the shortest sensible one!\n"));
-		}
+            throw DumbException("There was an attempt to trim down to a length\nthat is less than "
+                                "the shortest sensible one!\n");
+        }
 
-		SetLength(length-left-right,sp,off); //caps_mode is not relevant here
+        SetLength(length-left-right,sp,off); //caps_mode is not relevant here
 		SetSymmetricGap(spacer_length());
 
 		for (unsigned int i=0;i<seqs;i++)
@@ -525,13 +526,9 @@ istream & operator>> (istream & in, MarkovChainState & mcs)
 	if (token.empty())
 	{
 		//We did not find anything
-		throw
-				(*new IOStreamException
-					("Trying to read MarkovChainState from garbage.\n"));
-	}
-	else
-	{
-		mcs.length=k;
+        throw IOStreamException("Trying to read MarkovChainState from garbage.\n");
+    } else {
+        mcs.length=k;
 		unsigned int g5,g3;
 		do {
 			char ch=in.get();
@@ -554,7 +551,7 @@ istream & operator>> (istream & in, MarkovChainState & mcs)
 				}
 			}
 		} while(1);
-	}
+    }
   //now, we start to read the positions, token-by-token
 	mcs.seqs=0; //now, it is good tokens counter
 	do
@@ -612,10 +609,8 @@ istream & operator>> (istream & in, MarkovChainState & mcs)
 	if (!mcs.sequences())
 	{
 		//We did not find anything
-		throw
-				(*new IOStreamException
-					("Empty MarkovChainState is suspisious.\n"));
-	}
-	return in;
+        throw IOStreamException("Empty MarkovChainState is suspisious.\n");
+    }
+    return in;
 }
 #endif //_MARKOV_CHAIN_STATE_HPP

@@ -135,8 +135,7 @@ unsigned short Atgc::atgc2ushort(char letter)
     std::string message = "Trying to read symbol \'";
     message+=letter;
 	message+="\' as nucleoutide.\n";
-	throw * new AtgcException(message.c_str());
-	return 0;
+    throw AtgcException(message.c_str());
 }
 
 inline
@@ -149,8 +148,8 @@ char Atgc::ushort2atgc(unsigned short symbol)
 	  snprintf(symb_no,9,"%1i", symbol);	
 		message+=symb_no;
 		message+=" as an atgc number (1..4).\n";
-		throw * new AtgcException("Trying to get atgc char from something other then 1..4.\n");
-	}
+        throw AtgcException("Trying to get atgc char from something other then 1..4.\n");
+    }
 	return atgc[symbol];
 }
 
@@ -181,8 +180,8 @@ char Atgc::complement(char sym)
     std::string message = "Trying to fing complement to symbol \'";
     message+=sym;
 	message+="\'.\n";
-	throw * new AtgcException(message.c_str());
-	return 0;
+    throw AtgcException(message.c_str());
+    return 0;
 }
 
 inline std::vector<unsigned short> &Atgc::complement(std::vector<unsigned short> &dest)

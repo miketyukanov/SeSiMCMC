@@ -31,16 +31,22 @@ int main()
 	try
 	{
 		sp = new SequencesPile();
-	} catch(DumbException & de){cout<<de;return 10;}
-	cout<<"Add"<<endl<<flush;
+    } catch (const DumbException &de) {
+        cout << de;
+        return 10;
+    }
+    cout<<"Add"<<endl<<flush;
 	try
 	{
 		sp->add(a1,l1,"seq1");
 		sp->add(a2,l2,"seq2");
 		sp->add(a3,l3,"seq3");
-	} catch(AtgcException & ae){cout<<ae;return 10;}
+    } catch (const AtgcException &ae) {
+        cout << ae;
+        return 10;
+    }
 
-	cout<<"Sequence bunch is created..."<<endl<<flush;
+    cout<<"Sequence bunch is created..."<<endl<<flush;
 
 	for (unsigned int j=0;j<sp->size();j++)
 	{
@@ -54,9 +60,12 @@ int main()
 	try
 	{
 		sc=new SymbolsCounter(*sp,letters,cb);
-	} catch(DumbException & de){cout<<de;return 10;}
+    } catch (const DumbException &de) {
+        cout << de;
+        return 10;
+    }
 
-	cout<<"Counter was created with pattern length="
+    cout<<"Counter was created with pattern length="
 						<<pat_len<<" and alphabet="<<letters<<endl<<flush;
 	cout<<*sc;
 	mcs.positions[0]=0;

@@ -120,41 +120,30 @@ istream & operator>> (istream & is, SequencesPile & sp)
 
 			};
 			if (state==skipbefore && Buffer.find_first_not_of(" \t")!=string::npos)
-			throw
-					(
-						* new IOStreamException
-							("Fasta reader has found nonblank line before name.\n")
-					);
-			//it can be treat as error or as SequencesPile delimiter
-		case name_and_NBRF_comment_read:
-			//here, we have read the name from previous lines; the line can be
-			//NBRF comment (it has obligatory "-") or
-			//empty (omitted) or
-			//or the sequence or its part.
+                throw IOStreamException("Fasta reader has found nonblank line before name.\n");
+            //it can be treat as error or as SequencesPile delimiter
+        case name_and_NBRF_comment_read:
+            //here, we have read the name from previous lines; the line can be
+            //NBRF comment (it has obligatory "-") or
+            //empty (omitted) or
+            //or the sequence or its part.
 
-			//the NBRF part can appear only once, so:
-			if ((pos=Buffer.find_first_not_of(" \t"))!=string::npos)
-			{
-				if (Buffer[pos]=='-')
-				{
-					if (state==name_and_NBRF_comment_read)
-						throw
-								(
-									* new IOStreamException
-										("Fasta reader has found two NBRF comments in one record.\n")
-								);
-					state=name_and_NBRF_comment_read;
-					break; //from switch
-				}
-			}
-			else break; //from switch
+            //the NBRF part can appear only once, so:
+            if ((pos = Buffer.find_first_not_of(" \t")) != string::npos) {
+                if (Buffer[pos] == '-') {
+                    if (state==name_and_NBRF_comment_read)
+                        throw IOStreamException(
+                            "Fasta reader has found two NBRF comments in one record.\n");
+                    state = name_and_NBRF_comment_read;
+                    break; //from switch
+                }
+            } else
+                break; //from switch
 
+            //if we are here. the line is part of sequence or an error. So,
+            //the sequence has been started
 
-
-			//if we are here. the line is part of sequence or an error. So,
-			//the sequence has been started
-
-		case reading_sequence:
+        case reading_sequence:
 #if __DEBUGLEVEL__ >=5
 			cerr<<"#reading-seq"<<flush;
 #endif
@@ -218,17 +207,16 @@ istream & operator>> (istream & is, SequencesPile & sp)
 			sp.names.push_back(name);
 			try {
 				sp.push_back(Atgc::string2atgc(sequence_text,seq));
-			} catch (AtgcException A)
-			{
-				string message(A.info);
-				message+="\nThe pre-processed string that gained the error was:\n";
+            } catch (const AtgcException &A) {
+                string message(A.info);
+                message+="\nThe pre-processed string that gained the error was:\n";
 				message+=sequence_text;
 				message+="\n.\n";
-				throw * new AtgcException(message.c_str());
-			};
-			sp.nucleotides.push_back(sequence_text);
-			unsigned int current_length=sp.back().size();
-			sp.caps.push_back(*new vector<unsigned short>(current_length));
+                throw AtgcException(message.c_str());
+            };
+            sp.nucleotides.push_back(sequence_text);
+            unsigned int current_length = sp.back().size();
+            sp.caps.push_back(*new vector<unsigned short>(current_length));
 			sp.mask.push_back(*new vector<unsigned short>(current_length));
 			for (unsigned int pos=0;pos<current_length;pos++)
 			{
@@ -327,13 +315,12 @@ void SequencesPile::put_mask(const Profile & results,
 			seq_no++;
 			if (seq_no>=size())
 			{
-				throw (*new DumbException("Try to put mask from results of an alien sequence.\n"));
-			};
-		}
+                throw DumbException("Try to put mask from results of an alien sequence.\n");
+            };
+        }
 
-		unsigned int start_pos=
-				siteit->position+unmasked_wing;
-		unsigned int end_pos=
+        unsigned int start_pos = siteit->position + unmasked_wing;
+        unsigned int end_pos=
 				siteit->position+results.site_length-unmasked_wing-1;
 		if (!siteit->is_complement)
 		{

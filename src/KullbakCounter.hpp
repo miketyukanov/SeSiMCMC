@@ -22,7 +22,7 @@ class KullbakCounter
     KullbakCounter(const KullbakCounter &) = delete;
     KullbakCounter &operator=(const KullbakCounter &) = delete;
     //no copy constructor, no copy operation
-	double entropy_threshold;
+    double entropy_threshold;
 	//maximal entropy for a "stable" position :)
 	//Pay attention: it is entropy, not IC!
 	const SymbolsCounter & Symbols;
@@ -260,9 +260,9 @@ double long
 KullbakCounter::EntropyDistanceFrom(const SymbolsCounter::PWM &pwm) const
 {
 	if (Symbols.pattern_length!=pwm.pattern_length)
-		throw (* new SymbolsCounter::OtherLengthPWMException
-				("Trying to measure distance btw a PWN and a KullbakCounter of different lengthes.\n"));
-	//we suppose that both of them are created equal :)
+        throw SymbolsCounter::OtherLengthPWMException(
+            "Trying to measure distance btw a PWN and a KullbakCounter of different lengthes.\n");
+    //we suppose that both of them are created equal :)
 	//I mean geometry
 	double long Dist=0;
 	for (unsigned int i=0;i<Symbols.pattern_length;i++)

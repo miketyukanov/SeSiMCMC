@@ -141,8 +141,12 @@ Profile::Profile (const SequencesPile & sp, const MarkovChainState & mcs,
 			if (i)
 			{
 				it_was_trimmed=1;
-				try { state.trim(i,i,sp); } catch (DumbException & de) {diagnostics<<de.info;};
-			}
+                try {
+                    state.trim(i, i, sp);
+                } catch (const DumbException &de) {
+                    diagnostics << de.info;
+                };
+            }
 		}
 		else
 		//asymmetric; spacer here is 0
@@ -172,8 +176,12 @@ Profile::Profile (const SequencesPile & sp, const MarkovChainState & mcs,
 			if (i || j)
 			{
 				it_was_trimmed=1;
-				try { state.trim(i,j,sp); } catch (DumbException & de) {diagnostics<<de.info;};
-			}
+                try {
+                    state.trim(i, j, sp);
+                } catch (const DumbException &de) {
+                    diagnostics << de.info;
+                };
+            }
 		}
 		if (it_was_trimmed)
 		{

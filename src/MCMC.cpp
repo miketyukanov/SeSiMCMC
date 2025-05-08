@@ -436,33 +436,28 @@ double long LookingForAtgcMotifsMultinomialGibbs::find_maximum
 {
 
 	if (time_limit && timer.how_long()>(double)time_limit)
-		throw (* new TimeLimitException(time_limit));
+        throw TimeLimitException(time_limit);
 
-	if (max_steps==0ul-1)
-	{
-		max_steps=Sequences.size()*Sequences.find_median_length()
-							*Sequences.find_median_length()*Sequences.find_median_length();
-	}
+    if (max_steps == 0ul - 1) {
+        max_steps = Sequences.size() * Sequences.find_median_length()
+                    * Sequences.find_median_length() * Sequences.find_median_length();
+    }
 
-	if
-	(
-		local_step_cycles_between_adjustments<
-		5*cycles_with_minor_change_to_say_cold
-	)
-	local_step_cycles_between_adjustments=
-	5*cycles_with_minor_change_to_say_cold;
-	//just to be sure we have enough time to anneal between
-	//adjustments
+    if (local_step_cycles_between_adjustments < 5 * cycles_with_minor_change_to_say_cold)
+        local_step_cycles_between_adjustments = 5 * cycles_with_minor_change_to_say_cold;
+    //just to be sure we have enough time to anneal between
+    //adjustments
 
-	current_caps_mode=initial_caps;
+    current_caps_mode = initial_caps;
 
-	permutation_mode do_permutations=permut_adjustmentwise;
+    permutation_mode do_permutations = permut_adjustmentwise;
 
-	if (permutation_forbidden) do_permutations=permut_never; //test workaround
+    if (permutation_forbidden)
+        do_permutations = permut_never; //test workaround
 
-	vector <unsigned int> schedule(Sequences.size());
+    vector<unsigned int> schedule(Sequences.size());
 
-	for (unsigned int i=0;i<Sequences.size();i++) schedule[i]=i;
+    for (unsigned int i=0;i<Sequences.size();i++) schedule[i]=i;
 	//initial shedule is how-it-was-given
 	//ostream_iterator<unsigned int> out(cout," ");
 	//copy(schedule.begin(),schedule.end(),out);
@@ -564,23 +559,20 @@ double long LookingForAtgcMotifsMultinomialGibbs::find_maximum
 
 	if (ctmode != site_positions && ctmode != information && ctmode != correlation)
 	{
-		throw
-				(*new DumbException
-						("Unknown annealing test mode!!!.\n")
-				);
-	}
+        throw DumbException("Unknown annealing test mode!!!.\n");
+    }
 
-	Symbols=create_new_counter(Sequences,theState);
+    Symbols = create_new_counter(Sequences, theState);
 
-	Symbols->calculate(theState);
+    Symbols->calculate(theState);
 
-	SymbolsCounter::PWM pwm_prev(*Symbols);
-	//START_ANNEALING:
-	double standard_B=Symbols->pseudocounts_sum();
-	if (if_adaptive_pseudocounts)
-		Symbols->change_pseudocounts_sum(pseudocounts_sum_on_annealing);
+    SymbolsCounter::PWM pwm_prev(*Symbols);
+    //START_ANNEALING:
+    double standard_B = Symbols->pseudocounts_sum();
+    if (if_adaptive_pseudocounts)
+        Symbols->change_pseudocounts_sum(pseudocounts_sum_on_annealing);
 
-	if(!be_quiet) log_stream<<"Starting initial annealing attempts at "<<flush;
+    if(!be_quiet) log_stream<<"Starting initial annealing attempts at "<<flush;
 
 	unsigned int annealing_done=0;
 	unsigned int annealing_attempt_no=0;
@@ -593,35 +585,33 @@ double long LookingForAtgcMotifsMultinomialGibbs::find_maximum
 			annealing_attempt_no++;
 			if (annealing_attempt_no>annealing_attempts)
 			{
-				throw (* (new AllInitialAnnealingAttemptsFailed(annealing_attempts,initial_pattern_lenght)));
-			}
+                throw AllInitialAnnealingAttemptsFailed(annealing_attempts, initial_pattern_lenght);
+            }
 
-			pattern_length=initial_pattern_lenght;
+            pattern_length = initial_pattern_lenght;
 
+            if (!be_quiet)
+                log_stream << "Initial annealing attempt #" << annealing_attempt_no << " at "
+                           << flush;
 
-			if(!be_quiet) log_stream<<"Initial annealing attempt #"<<annealing_attempt_no<<" at "<<flush;
-
-			if (adjust_pattern_length)
-			{
-				//1 step uses initial_pattern_lenght
-				//2 initial_pattern_lenght / sqrt(2)
-				//3 initial_pattern_lenght * sqrt(2)
-				//4 initial_pattern_lenght / 2
-				//5 initial_pattern_lenght * 2
-				if (annealing_attempt_no%2) //3,5...
-				{
-					for (unsigned int step_no=5;
-							step_no<=annealing_attempt_no;step_no+=4)
-						//5,9,...
+            if (adjust_pattern_length) {
+                //1 step uses initial_pattern_lenght
+                //2 initial_pattern_lenght / sqrt(2)
+                //3 initial_pattern_lenght * sqrt(2)
+                //4 initial_pattern_lenght / 2
+                //5 initial_pattern_lenght * 2
+                if (annealing_attempt_no % 2) //3,5...
+                {
+                    for (unsigned int step_no = 5; step_no <= annealing_attempt_no; step_no += 4)
+                        //5,9,...
 								pattern_length*=2;
 					if ((annealing_attempt_no%4)==3) //3,7,11
 						pattern_length=(int)floor((double)pattern_length*sqrt((float)2));
 					if (pattern_length>maximal_length) pattern_length=maximal_length;
-				}
-				else //2,4,6...
-				{
-					double p_length=(double)pattern_length;
-					for (unsigned int step_no=4;
+                } else //2,4,6...
+                {
+                    double p_length = (double) pattern_length;
+                    for (unsigned int step_no=4;
 							step_no<=annealing_attempt_no;step_no+=4)
 						//4,8,....
 								p_length/=2;
@@ -631,16 +621,14 @@ double long LookingForAtgcMotifsMultinomialGibbs::find_maximum
 
 					pattern_length=(int)floor(p_length);
 					if (pattern_length<minimal_length) pattern_length=minimal_length;
+                }
+            }
+        } else
+            annealing_attempt_no++;
 
-				}
-			}
-		}
-		else
-			annealing_attempt_no++;
+        annealing_steps_made = 0;
 
-		annealing_steps_made=0;
-
-		the_state.SetLength (pattern_length, Sequences,current_caps_mode);
+        the_state.SetLength (pattern_length, Sequences,current_caps_mode);
 		if(!be_quiet) log_stream<<"length="<<pattern_length<<"...\n"<<flush;
 
 		current_caps_mode=initial_caps;
@@ -685,51 +673,51 @@ double long LookingForAtgcMotifsMultinomialGibbs::find_maximum
 				the_state.motif_present[i]=0;
 		}
 		if (sequences_long_enough*3<sequences_count)
-			throw (*new LenghtRequirementsFailed(sequences_OK,sequences_count));
+            throw LenghtRequirementsFailed(sequences_OK, sequences_count);
 
-		if (sequences_OK*3<sequences_count)
-			throw (*new TooResrtrictiveCapsMode(sequences_OK,sequences_count));
+        if (sequences_OK * 3 < sequences_count)
+            throw TooResrtrictiveCapsMode(sequences_OK, sequences_count);
 
-		if(!be_quiet) log_stream<<"\nThe sampler initialised for the annealing attempt "
-			<<annealing_attempt_no<<endl<<theState<<endl<<flush;
+        if (!be_quiet)
+            log_stream << "\nThe sampler initialised for the annealing attempt "
+                       << annealing_attempt_no << endl
+                       << theState << endl
+                       << flush;
 
-		Symbols=create_new_counter(Sequences,theState);
-		//we are going to start sample the space with aStep() to anneal.
-		//We can realise that the annealing is
-		//over after cycles_with_minor_change_to_say_cold adjustments
-		//have not change state too much.
+        Symbols = create_new_counter(Sequences, theState);
+        //we are going to start sample the space with aStep() to anneal.
+        //We can realise that the annealing is
+        //over after cycles_with_minor_change_to_say_cold adjustments
+        //have not change state too much.
 
+        Symbols->calculate(theState);
 
-		Symbols->calculate(theState);
+        pwm_prev = *Symbols;
 
-		pwm_prev=*Symbols;
+        current_caps_mode = annealing_caps;
 
-		current_caps_mode=annealing_caps;
+        while (1) //annealing attempt
+        {
+            if (time_limit && timer.how_long() > (double) time_limit)
+                throw TimeLimitException(time_limit);
+            //if(!be_quiet) log_stream<<"\nTime check: limit="<<time_limit<<" timer.how_long()="<<timer.how_long()<<")...\n"<<flush;
 
-		while(1)  //annealing attempt
-		{
-
-			if (time_limit && timer.how_long()>(double)time_limit) throw (* new TimeLimitException(time_limit));
-			//if(!be_quiet) log_stream<<"\nTime check: limit="<<time_limit<<" timer.how_long()="<<timer.how_long()<<")...\n"<<flush;
-
-
-			//		aStep();
-			if ( local_steps_made_after_adjustment<
-					local_step_cycles_between_adjustments*sequences_count )
-				//a local step
-			{
-				if (current_sequence_index==0)
-				//local steps cycles border, let's check the annealing-is-over
-				//conditon
-				{
-					current_annealing_cycle++;
-					if (current_annealing_cycle>cycles_per_annealing_attempt)
-					{
-						if (!be_quiet) log_stream<<"Annealing attempt failed.\n"<<flush;
+            //		aStep();
+            if (local_steps_made_after_adjustment
+                < local_step_cycles_between_adjustments * sequences_count)
+            //a local step
+            {
+                if (current_sequence_index == 0)
+                //local steps cycles border, let's check the annealing-is-over
+                //conditon
+                {
+                    current_annealing_cycle++;
+                    if (current_annealing_cycle > cycles_per_annealing_attempt) {
+                        if (!be_quiet) log_stream<<"Annealing attempt failed.\n"<<flush;
 						break;
 						//this annealing attempt failed
-					}
-					if (ctmode == site_positions)
+                    }
+                    if (ctmode == site_positions)
 					{
 						double scal_prod=state_before*theState;
 						if (scal_prod>=minor_change_level)
@@ -779,12 +767,11 @@ double long LookingForAtgcMotifsMultinomialGibbs::find_maximum
 						//cerr<<"PWM after copy:  ";print_foreground_probablities(pwm_prev,cerr);
 						//cerr<<"##################################################\n"<<flush;
 					}
-				}
-				//if current sequence is too short,
-				//we jump away from it.
-				if (!theState.motif_was_too_long[schedule[current_sequence_index]])
-				{
-					unsigned short last_motif_protection=
+                }
+                //if current sequence is too short,
+                //we jump away from it.
+                if (!theState.motif_was_too_long[schedule[current_sequence_index]]) {
+                    unsigned short last_motif_protection=
 							(theState.present_motifs()<1) ||
 							(theState.present_motifs()==1 &&
 							 theState.motif_present[schedule[current_sequence_index]]==1);
@@ -796,22 +783,21 @@ double long LookingForAtgcMotifsMultinomialGibbs::find_maximum
 					if (last_motif_protection) motif_absence_prior=m_a_p_v;
 					local_steps_made++;
 					local_steps_made_after_adjustment++;
-				}
-				current_sequence_index++;
+                }
+                current_sequence_index++;
 				current_sequence_index%=sequences_count;
 				//current_sequence_index=(++current_sequence_index)%sequences_count;
 			//set the next current sequence
-			}
-			else
-			//an adjustment
-			{
-				if (do_permutations==permut_adjustmentwise) RandomPermutationMapping(schedule);
-//				copy(schedule.begin(),schedule.end(),out);
-//				cout<<endl<<flush;
+            } else
+            //an adjustment
+            {
+                if (do_permutations == permut_adjustmentwise)
+                    RandomPermutationMapping(schedule);
+                //				copy(schedule.begin(),schedule.end(),out);
+                //				cout<<endl<<flush;
 
-				if (adjustments_during_annealing)
-				{
-					if (adjust_motif_length_on_annealing)
+                if (adjustments_during_annealing) {
+                    if (adjust_motif_length_on_annealing)
 						PositionAndLengthAdjustment
 								(minimal_length,maximal_length,
 								 0, //no gap-test
@@ -824,13 +810,13 @@ double long LookingForAtgcMotifsMultinomialGibbs::find_maximum
 					NormaliseState();
 					local_cycles_with_minor_change=0;
 					pwm_prev=*Symbols;
-				}
-			}
+                }
+            }
 //		we are here, so it was not a break "say cold";
 //			if (++annealing_steps_made>max_annealing_steps) cout<<"RRRR"<<flush;
 			if (++annealing_steps_made>max_annealing_steps) break;
-		}
-		// initial annealing is over if it was it was a break "say cold"
+        }
+        // initial annealing is over if it was it was a break "say cold"
 		// and so annealing_done=1;
 	} //while(annealing_done)
 	NormaliseState();
@@ -841,117 +827,109 @@ double long LookingForAtgcMotifsMultinomialGibbs::find_maximum
 	while(1)  //secondary annealing, still no length adjstms
 	{
 //		aStep();
-		if (time_limit && timer.how_long()>(double)time_limit) throw (* new TimeLimitException(time_limit));
+if (time_limit && timer.how_long() > (double) time_limit)
+    throw TimeLimitException(time_limit);
 
-		if ( local_steps_made_after_adjustment<
-				local_step_cycles_between_adjustments*sequences_count )
-			//a local step
-		{
-			if (current_sequence_index==0)
-			//local steps cycles border, let's check the annealing-is-over
-			//conditon
-			{
-				if (ctmode == site_positions)
-				{
-					double scal_prod=state_before*theState;
-					if (scal_prod>=minor_change_level)
-					{
-						if ( ++local_cycles_with_minor_change>=
-											 cycles_with_minor_change_to_say_cold)
-							break;
-						//annealing is over, we say cold
-					}
-					else
-						local_cycles_with_minor_change=0;
-					state_before=theState;
-					//if(!be_quiet) log_stream<<"Product="<<scal_prod<<endl<<flush;
-					}
-					//site_positions
-				else //information
-				{
-					//cerr<<"PWM:  ";print_foreground_probablities(pwm_prev,cerr);
-					//cerr<<"Symbols:  ";print_foreground_probablities(*Symbols,cerr);
-					KullbakCounter Kullbak(*Symbols);
-					double long distance = Kullbak.EntropyDistanceFrom(pwm_prev);
-					if
-						(
-						 	Kullbak.strong_positions_counter>=strong_positions_to_be_cold &&
-						 	Kullbak.strong_positions_counter>=pattern_length/4 &&
-							distance/Kullbak.strong_positions_IC<=minor_change_level
-						)
-					{
-						if ( ++local_cycles_with_minor_change>=
-											 cycles_with_minor_change_to_say_cold)
-							break;
-						//annealing is over, we say cold
-					}
-					else
-						local_cycles_with_minor_change=0;
-					pwm_prev=*Symbols;
-					if(!be_quiet) log_stream<<"Distance(annealing)="<<distance<<
-						"   StrongIC="<<Kullbak.strong_positions_IC<<"  in "<<
-								Kullbak.strong_positions_counter<<" position."<<endl<<flush;
-					//cerr<<"PWM after copy:  ";print_foreground_probablities(pwm_prev,cerr);
-					//cerr<<"##################################################\n"<<flush;
-				}
-			}
-			//if current sequence is too short,
-			//we jump away from it.
-			if (!theState.motif_was_too_long[schedule[current_sequence_index]])
-			{
-				unsigned short last_motif_protection=
-						(theState.present_motifs()<1) ||
-						(theState.present_motifs()==1 &&
-						 theState.motif_present[schedule[current_sequence_index]]==1);
-				double m_a_p_v=motif_absence_prior;
-				if (last_motif_protection) motif_absence_prior=0;
-				Symbols->exclude_sequence(theState,schedule[current_sequence_index]);
-				LocalGibbsStep(schedule[current_sequence_index]);
-				Symbols->include_sequence(theState,schedule[current_sequence_index]);
-				if (last_motif_protection) motif_absence_prior=m_a_p_v;
-				local_steps_made++;
-				local_steps_made_after_adjustment++;
-			}
-			current_sequence_index++;
-			current_sequence_index%=sequences_count;
-			//current_sequence_index=(++current_sequence_index)%sequences_count;
-			//set the next current sequence
-		}
-		else
-			//an adjustment
-		{
-			if (do_permutations==permut_adjustmentwise) RandomPermutationMapping(schedule);
-			//copy(schedule.begin(),schedule.end(),out);
-			//cout<<endl<<flush;
+if (local_steps_made_after_adjustment < local_step_cycles_between_adjustments * sequences_count)
+//a local step
+{
+    if (current_sequence_index == 0)
+    //local steps cycles border, let's check the annealing-is-over
+    //conditon
+    {
+        if (ctmode == site_positions) {
+            double scal_prod = state_before * theState;
+            if (scal_prod >= minor_change_level) {
+                if (++local_cycles_with_minor_change >= cycles_with_minor_change_to_say_cold)
+                    break;
+                //annealing is over, we say cold
+            } else
+                local_cycles_with_minor_change = 0;
+            state_before = theState;
+            //if(!be_quiet) log_stream<<"Product="<<scal_prod<<endl<<flush;
+        }
+        //site_positions
+        else //information
+        {
+            //cerr<<"PWM:  ";print_foreground_probablities(pwm_prev,cerr);
+            //cerr<<"Symbols:  ";print_foreground_probablities(*Symbols,cerr);
+            KullbakCounter Kullbak(*Symbols);
+            double long distance = Kullbak.EntropyDistanceFrom(pwm_prev);
+            if (Kullbak.strong_positions_counter >= strong_positions_to_be_cold
+                && Kullbak.strong_positions_counter >= pattern_length / 4
+                && distance / Kullbak.strong_positions_IC <= minor_change_level) {
+                if (++local_cycles_with_minor_change >= cycles_with_minor_change_to_say_cold)
+                    break;
+                //annealing is over, we say cold
+            } else
+                local_cycles_with_minor_change = 0;
+            pwm_prev = *Symbols;
+            if (!be_quiet)
+                log_stream << "Distance(annealing)=" << distance
+                           << "   StrongIC=" << Kullbak.strong_positions_IC << "  in "
+                           << Kullbak.strong_positions_counter << " position." << endl
+                           << flush;
+            //cerr<<"PWM after copy:  ";print_foreground_probablities(pwm_prev,cerr);
+            //cerr<<"##################################################\n"<<flush;
+        }
+    }
+    //if current sequence is too short,
+    //we jump away from it.
+    if (!theState.motif_was_too_long[schedule[current_sequence_index]]) {
+        unsigned short last_motif_protection
+            = (theState.present_motifs() < 1)
+              || (theState.present_motifs() == 1
+                  && theState.motif_present[schedule[current_sequence_index]] == 1);
+        double m_a_p_v = motif_absence_prior;
+        if (last_motif_protection)
+            motif_absence_prior = 0;
+        Symbols->exclude_sequence(theState, schedule[current_sequence_index]);
+        LocalGibbsStep(schedule[current_sequence_index]);
+        Symbols->include_sequence(theState, schedule[current_sequence_index]);
+        if (last_motif_protection)
+            motif_absence_prior = m_a_p_v;
+        local_steps_made++;
+        local_steps_made_after_adjustment++;
+    }
+    current_sequence_index++;
+    current_sequence_index %= sequences_count;
+    //current_sequence_index=(++current_sequence_index)%sequences_count;
+    //set the next current sequence
+} else
+//an adjustment
+{
+    if (do_permutations == permut_adjustmentwise)
+        RandomPermutationMapping(schedule);
+    //copy(schedule.begin(),schedule.end(),out);
+    //cout<<endl<<flush;
 
-			if (adjustments_during_annealing)
-			{
-				if (adjust_motif_length_on_annealing)
-					PositionAndLengthAdjustment
-							(minimal_length,maximal_length,
-							 0, //no gap-test
-							 local_steps_made,adjustments_made);
-				//the previous line is just courtesy
-				else PositionAdjustment(local_steps_made,adjustments_made,0 );
-				//no gap-test
-				adjustments_made++;
-				local_steps_made_after_adjustment=0;
-				NormaliseState();
-				local_cycles_with_minor_change=0;
-				pwm_prev=*Symbols;
-			}
-		}
+    if (adjustments_during_annealing) {
+        if (adjust_motif_length_on_annealing)
+            PositionAndLengthAdjustment(minimal_length,
+                                        maximal_length,
+                                        0, //no gap-test
+                                        local_steps_made,
+                                        adjustments_made);
+        //the previous line is just courtesy
+        else
+            PositionAdjustment(local_steps_made, adjustments_made, 0);
+        //no gap-test
+        adjustments_made++;
+        local_steps_made_after_adjustment = 0;
+        NormaliseState();
+        local_cycles_with_minor_change = 0;
+        pwm_prev = *Symbols;
+    }
+}
 //		aStep() is over;
 		if (++annealing_steps_made>max_annealing_steps)
-			throw (*new LostInSpaceOnSecondaryAnnealing
-							(max_annealing_steps,initial_pattern_lenght)
-				);
+            throw LostInSpaceOnSecondaryAnnealing(max_annealing_steps, initial_pattern_lenght);
+    }
+    // secondary annealing is over
 
-	}
-	// secondary annealing is over
-
-	if (if_adaptive_pseudocounts) Symbols->change_pseudocounts_sum(standard_B);
-	NormaliseState();
+    if (if_adaptive_pseudocounts)
+        Symbols->change_pseudocounts_sum(standard_B);
+    NormaliseState();
 	if(!be_quiet) log_stream<<"\n\nThe sampler is finally annealed ... \n\n"<<flush;
 
 	//Now, we choose the more strong criteria for
@@ -1042,152 +1020,133 @@ double long LookingForAtgcMotifsMultinomialGibbs::find_maximum
 	while(tracing_steps_made++<=max_steps )
 	{
 //		aStep();
-		if (time_limit && timer.how_long()>(double)time_limit) throw (* new TimeLimitException(time_limit));
+if (time_limit && timer.how_long() > (double) time_limit)
+    throw TimeLimitException(time_limit);
 
-		if ( local_steps_made_after_adjustment<
-				local_step_cycles_between_adjustments*sequences_count )
-			//a local step
-		{
-			if (current_sequence_index==0 &&
-					local_steps_made_after_adjustment>=sequences_count)
-			//local steps cycles border, let's check the annealing-is-over
-			//conditon (it is necessary for adjustment permission)
-			{
-				if (ctmode == site_positions)
-				{
-					double scal_prod=state_before*theState;
-					if (scal_prod>=minor_change_level)
-					{
-						if ( ++local_cycles_with_minor_change>=
-											 cycles_with_minor_change_to_say_cold)
-							forbid_length_adjustment=0;
-						//annealing is over, we say cold
-					}
-					else
-					{
-						local_cycles_with_minor_change=0;
-						forbid_length_adjustment=1;
-					}
-					state_before=theState;
-				//if(!be_quiet) log_stream<<"Product="<<scal_prod<<endl<<flush;
-				} //scalar
-				else //informational
-				{
-					//cerr<<"PWM:  ";print_foreground_probablities(pwm_prev,cerr);
-					//cerr<<"Symbols:  ";print_foreground_probablities(*Symbols,cerr);
-					KullbakCounter Kullbak(*Symbols);
-					double long distance = Kullbak.EntropyDistanceFrom(pwm_prev);
-					if
-						(
-						 	Kullbak.strong_positions_counter>=strong_positions_to_be_cold &&
-							distance/Kullbak.strong_positions_IC<=minor_change_level
-						)
-					{
-						if ( ++local_cycles_with_minor_change>=
-											 cycles_with_minor_change_to_say_cold)
-							forbid_length_adjustment=0;
-						//annealing is over, we say cold
-					}
-					else
-					{
-						local_cycles_with_minor_change=0;
-						forbid_length_adjustment=1;
-					}
-					pwm_prev=*Symbols;
+if (local_steps_made_after_adjustment < local_step_cycles_between_adjustments * sequences_count)
+//a local step
+{
+    if (current_sequence_index == 0 && local_steps_made_after_adjustment >= sequences_count)
+    //local steps cycles border, let's check the annealing-is-over
+    //conditon (it is necessary for adjustment permission)
+    {
+        if (ctmode == site_positions) {
+            double scal_prod = state_before * theState;
+            if (scal_prod >= minor_change_level) {
+                if (++local_cycles_with_minor_change >= cycles_with_minor_change_to_say_cold)
+                    forbid_length_adjustment = 0;
+                //annealing is over, we say cold
+            } else {
+                local_cycles_with_minor_change = 0;
+                forbid_length_adjustment = 1;
+            }
+            state_before = theState;
+            //if(!be_quiet) log_stream<<"Product="<<scal_prod<<endl<<flush;
+        } //scalar
+        else //informational
+        {
+            //cerr<<"PWM:  ";print_foreground_probablities(pwm_prev,cerr);
+            //cerr<<"Symbols:  ";print_foreground_probablities(*Symbols,cerr);
+            KullbakCounter Kullbak(*Symbols);
+            double long distance = Kullbak.EntropyDistanceFrom(pwm_prev);
+            if (Kullbak.strong_positions_counter >= strong_positions_to_be_cold
+                && distance / Kullbak.strong_positions_IC <= minor_change_level) {
+                if (++local_cycles_with_minor_change >= cycles_with_minor_change_to_say_cold)
+                    forbid_length_adjustment = 0;
+                //annealing is over, we say cold
+            } else {
+                local_cycles_with_minor_change = 0;
+                forbid_length_adjustment = 1;
+            }
+            pwm_prev = *Symbols;
 
-					if(!be_quiet) log_stream<<"Distance(annealing)="<<distance<<
-						"   StrongIC="<<Kullbak.strong_positions_IC<<"  in "<<
-								Kullbak.strong_positions_counter<<" position."<<endl<<flush;
-					//cerr<<"PWM after copy:  ";print_foreground_probablities(pwm_prev,cerr);
-				//cerr<<"##################################################\n"<<flush;
-				}
-			}
-			//if current sequence is too short,
-			//we jump away from it.
-			if (!theState.motif_was_too_long[schedule[current_sequence_index]])
-			{
-				Symbols->exclude_sequence(theState,schedule[current_sequence_index]);
-				LocalGibbsStep(schedule[current_sequence_index]);
-				Symbols->include_sequence(theState,schedule[current_sequence_index]);
-				local_steps_made++;
-				local_steps_made_after_adjustment++;
-				if (bestLocalF<(F=Symbols->NegativeEntropy()))
-				{
-					bestLocalF=F;
-					TheBestStateAfterAdj=theState;
-					if(
-						 maxG<
-								(G=Negative_Entropy_with_defined_patterns_per_pattern_position
-									 (
-											theState,
-											F
-									 )
-								)
-						)
-					{
-						LastBestState=theState;
-						maxG=G;
-						if(!be_quiet) log_stream<<"***Local maximum (F="<<bestLocalF<<", G="<<maxG
-								<<" ) : \n"<<theState<<endl;
-						steps_after_maximum=0;
-						an_adjustment_was_made_after_maximum=0;
-					}
-					//whatever, this one is the best after the last adjsmt
-				}
-				else //the local maximum is still the best
-				{
-					if (++steps_after_maximum>=steps_number_globalises_maximum &&
-						an_adjustment_was_made_after_maximum)
-					{
-						//it is global!!!
-						the_state=LastBestState;
-						maxG=Negative_Entropy_with_defined_patterns_per_pattern_position
-									 (
-											theState,
-											F
-									 );
-						NormaliseState();
-						delete Symbols;
-						if(!be_quiet) log_stream<<"***Global maximum, so returning ... (F="<<bestLocalF<<", G="<<maxG<<")"<<endl<<flush;
-						return maxG;
-					}
-				}
-			}
-			current_sequence_index++;
-			current_sequence_index%=sequences_count;
-			//current_sequence_index=(++current_sequence_index)%sequences_count;
-			//set the next current sequence
-		}
-		else
-			//an adjustment
-		{
-			if (do_permutations==permut_adjustmentwise) RandomPermutationMapping(schedule);
-			//copy(schedule.begin(),schedule.end(),out);
-			//cout<<endl<<flush;
+            if (!be_quiet)
+                log_stream << "Distance(annealing)=" << distance
+                           << "   StrongIC=" << Kullbak.strong_positions_IC << "  in "
+                           << Kullbak.strong_positions_counter << " position." << endl
+                           << flush;
+            //cerr<<"PWM after copy:  ";print_foreground_probablities(pwm_prev,cerr);
+            //cerr<<"##################################################\n"<<flush;
+        }
+    }
+    //if current sequence is too short,
+    //we jump away from it.
+    if (!theState.motif_was_too_long[schedule[current_sequence_index]]) {
+        Symbols->exclude_sequence(theState, schedule[current_sequence_index]);
+        LocalGibbsStep(schedule[current_sequence_index]);
+        Symbols->include_sequence(theState, schedule[current_sequence_index]);
+        local_steps_made++;
+        local_steps_made_after_adjustment++;
+        if (bestLocalF < (F = Symbols->NegativeEntropy())) {
+            bestLocalF = F;
+            TheBestStateAfterAdj = theState;
+            if (maxG
+                < (G = Negative_Entropy_with_defined_patterns_per_pattern_position(theState, F))) {
+                LastBestState = theState;
+                maxG = G;
+                if (!be_quiet)
+                    log_stream << "***Local maximum (F=" << bestLocalF << ", G=" << maxG
+                               << " ) : \n"
+                               << theState << endl;
+                steps_after_maximum = 0;
+                an_adjustment_was_made_after_maximum = 0;
+            }
+            //whatever, this one is the best after the last adjsmt
+        } else //the local maximum is still the best
+        {
+            if (++steps_after_maximum >= steps_number_globalises_maximum
+                && an_adjustment_was_made_after_maximum) {
+                //it is global!!!
+                the_state = LastBestState;
+                maxG = Negative_Entropy_with_defined_patterns_per_pattern_position(theState, F);
+                NormaliseState();
+                delete Symbols;
+                if (!be_quiet)
+                    log_stream << "***Global maximum, so returning ... (F=" << bestLocalF
+                               << ", G=" << maxG << ")" << endl
+                               << flush;
+                return maxG;
+            }
+        }
+    }
+    current_sequence_index++;
+    current_sequence_index %= sequences_count;
+    //current_sequence_index=(++current_sequence_index)%sequences_count;
+    //set the next current sequence
+} else
+//an adjustment
+{
+    if (do_permutations == permut_adjustmentwise)
+        RandomPermutationMapping(schedule);
+    //copy(schedule.begin(),schedule.end(),out);
+    //cout<<endl<<flush;
 
-			if ( !forbid_length_adjustment)
-				//adjustment permisson check
-			{
-	// optimisation, odnako... Posmotrim.....Nachinat Adjust s
-	// nailuchsego a ne s tekushego.
-	//			state_before=theState;
-	//			the_state=TheBestStateAfterAdj;
-	//			Symbols->calculate(theState);
+    if (!forbid_length_adjustment)
+    //adjustment permisson check
+    {
+        // optimisation, odnako... Posmotrim.....Nachinat Adjust s
+        // nailuchsego a ne s tekushego.
+        //			state_before=theState;
+        //			the_state=TheBestStateAfterAdj;
+        //			Symbols->calculate(theState);
 
-				NormaliseState();
-				StateBeforeTheLastRegularAdjustment=theState;
-				maxGBeforeTheLastRegularAdjustment=maxG;
-				adjacent_forbidden_adjustments=0;
-				if (adjust_motif_length_on_sampling) G=PositionAndLengthAdjustment
-					(minimal_length,maximal_length,spaced,local_steps_made,adjustments_made);
-				else
-					G=PositionAdjustment(local_steps_made,adjustments_made,spaced);
-				adjustments_made++;
-				local_steps_made_after_adjustment=0;
-				an_adjustment_was_made_after_maximum=1;
-//			Symbols->calculate(theState) was made by the adjustment;
-				if (last_adjustment_has_changed_state)
-				{
+        NormaliseState();
+        StateBeforeTheLastRegularAdjustment = theState;
+        maxGBeforeTheLastRegularAdjustment = maxG;
+        adjacent_forbidden_adjustments = 0;
+        if (adjust_motif_length_on_sampling)
+            G = PositionAndLengthAdjustment(minimal_length,
+                                            maximal_length,
+                                            spaced,
+                                            local_steps_made,
+                                            adjustments_made);
+        else
+            G = PositionAdjustment(local_steps_made, adjustments_made, spaced);
+        adjustments_made++;
+        local_steps_made_after_adjustment = 0;
+        an_adjustment_was_made_after_maximum = 1;
+        //			Symbols->calculate(theState) was made by the adjustment;
+        if (last_adjustment_has_changed_state) {
 #if __DEBUGLEVEL__ >=1
 					log_stream<<"Adjustment has changed state.\n"<<flush;
 #endif
@@ -1202,9 +1161,7 @@ double long LookingForAtgcMotifsMultinomialGibbs::find_maximum
 					}
 					local_cycles_with_minor_change=0;
 					pwm_prev=*Symbols;
-				}
-				else
-				{
+        } else {
 #if __DEBUGLEVEL__ >=1
 					log_stream<<"Adjustment has not changed state.\n"<<flush;
 #endif
@@ -1213,58 +1170,62 @@ double long LookingForAtgcMotifsMultinomialGibbs::find_maximum
 				//	the_state=state_before;
 				//	Symbols->calculate(theState);
 				//
-				}
+        }
 #if __DEBUGLEVEL__ >=3
 				log_stream<<"Dbg.\n"<<theState<<*Symbols<<endl<<flush;
 #endif
-			}
-			else // adjustment is forbidden, the sampler is too hot.
-			{
-				adjacent_forbidden_adjustments++;
-				if(!be_quiet) log_stream<<"The sampler-is-annealed test failed ("<<
-					adjacent_forbidden_adjustments<<
-					" 's adjacent one). \n";
-//       Commented forbiden adjustment!!!!!!
-//				if (adjustments_during_annealing)
-//					PositionAdjustment(local_steps_made,adjustments_made,spaced);
-//					PositionAdjustment(local_steps_made,adjustments_made,0);
-//       Commented forbiden adjustment!!!!!!
-				else
-				{
-					if(!be_quiet) log_stream<<"An adjustment is forbidden after "<<
-					local_steps_made<<" steps and "<<adjustments_made<<" regular adjustments made."<<
-					"The state is :"<<endl<<theState;
-					if(!be_quiet) log_stream<<"\n"<<flush;
-				}
-				local_steps_made_after_adjustment=0;
-				local_cycles_with_minor_change=0;
-				pwm_prev=*Symbols;
-				if (adjacent_forbidden_adjustments>=adjs_chain_fails_after)
-				{
-					if(!be_quiet) log_stream<<"A chain has failed ";
-					the_state=StateBeforeTheLastRegularAdjustment;
-					Symbols->calculate(theState);
-					maxG=maxGBeforeTheLastRegularAdjustment;
-					an_adjustment_was_made_after_maximum=0;
-					steps_after_maximum=0;
-					failed_chains++;
-					adjacent_forbidden_adjustments=0;
-					pwm_prev=*Symbols;
-					local_cycles_with_minor_change=0;
-					forbid_length_adjustment=0;
-					if(!be_quiet) log_stream<<"!!!\n";
-					if (failed_chains>=chains_to_try)
-					{
-						if(!be_quiet) log_stream<<"All chains failed. Throwing exception at maxG="<<maxG<<"!!!"<<endl<<flush;
-						throw (* new TooMuchChainsFailed(failed_chains,initial_pattern_lenght,maxG));
-					}
-				}
-			}
-		}
+    } else // adjustment is forbidden, the sampler is too hot.
+    {
+        adjacent_forbidden_adjustments++;
+        if (!be_quiet)
+            log_stream << "The sampler-is-annealed test failed (" << adjacent_forbidden_adjustments
+                       << " 's adjacent one). \n";
+        //       Commented forbiden adjustment!!!!!!
+        //				if (adjustments_during_annealing)
+        //					PositionAdjustment(local_steps_made,adjustments_made,spaced);
+        //					PositionAdjustment(local_steps_made,adjustments_made,0);
+        //       Commented forbiden adjustment!!!!!!
+        else {
+            if (!be_quiet)
+                log_stream << "An adjustment is forbidden after " << local_steps_made
+                           << " steps and " << adjustments_made << " regular adjustments made."
+                           << "The state is :" << endl
+                           << theState;
+            if (!be_quiet)
+                log_stream << "\n" << flush;
+        }
+        local_steps_made_after_adjustment = 0;
+        local_cycles_with_minor_change = 0;
+        pwm_prev = *Symbols;
+        if (adjacent_forbidden_adjustments >= adjs_chain_fails_after) {
+            if (!be_quiet)
+                log_stream << "A chain has failed ";
+            the_state = StateBeforeTheLastRegularAdjustment;
+            Symbols->calculate(theState);
+            maxG = maxGBeforeTheLastRegularAdjustment;
+            an_adjustment_was_made_after_maximum = 0;
+            steps_after_maximum = 0;
+            failed_chains++;
+            adjacent_forbidden_adjustments = 0;
+            pwm_prev = *Symbols;
+            local_cycles_with_minor_change = 0;
+            forbid_length_adjustment = 0;
+            if (!be_quiet)
+                log_stream << "!!!\n";
+            if (failed_chains >= chains_to_try) {
+                if (!be_quiet)
+                    log_stream << "All chains failed. Throwing exception at maxG=" << maxG << "!!!"
+                               << endl
+                               << flush;
+                throw TooMuchChainsFailed(failed_chains, initial_pattern_lenght, maxG);
+            }
+        }
+    }
+}
 //		aStep() is over;
 	}
 	if(!be_quiet) log_stream<<"lost in space. Throwing exception at maxG="<<maxG<<"!!!"<<endl<<flush;
-	throw (*new LostInSpaceOnTracing(max_steps,initial_pattern_lenght,maxG));
+    throw LostInSpaceOnTracing(max_steps, initial_pattern_lenght, maxG);
 }
 
 double LookingForAtgcMotifsMultinomialGibbs::find_maximum_slowly
@@ -1337,36 +1298,28 @@ double LookingForAtgcMotifsMultinomialGibbs::find_maximum_slowly
 				//1 //reanneal_if_all_chains_failed
 			);
 			if(!be_quiet) log_stream<<"Ordinary return from find_maximum."<<endl<<the_state<<"G="<<G<<endl<<flush;
-		}
-		catch(LookingForAtgcMotifsMultinomialGibbs::LostInSpaceOnSecondaryAnnealing & lo)
-		{
-			unreliable=2;
-			diagnostics<<lo;
+        } catch (const LookingForAtgcMotifsMultinomialGibbs::LostInSpaceOnSecondaryAnnealing &lo) {
+            unreliable = 2;
+            diagnostics<<lo;
 			if(!be_quiet) log_stream<<"LostInSpaceOnSecondaryAnnealing caught."<<endl<<flush;
-		}
-		catch(LookingForAtgcMotifsMultinomialGibbs::AllInitialAnnealingAttemptsFailed & lo)
-		{
-			unreliable=2;
-			diagnostics<<lo;
+        } catch (const LookingForAtgcMotifsMultinomialGibbs::AllInitialAnnealingAttemptsFailed &lo) {
+            unreliable = 2;
+            diagnostics<<lo;
 			if(!be_quiet) log_stream<<"AllInitialAnnealingAttemptsFailed caught."<<endl<<flush;
-		}
-		catch(LookingForAtgcMotifsMultinomialGibbs::LostInSpaceOnTracing &  lo)
-		{
-			unreliable=1;
-			diagnostics<<lo;
+        } catch (const LookingForAtgcMotifsMultinomialGibbs::LostInSpaceOnTracing &lo) {
+            unreliable = 1;
+            diagnostics<<lo;
 			G=lo.maxG;
 			if(!be_quiet) log_stream<<"LostInSpaceOnTracing caught."<<endl<<the_state<<"G="<<G<<endl<<flush;
-		}
-		catch(LookingForAtgcMotifsMultinomialGibbs::TooMuchChainsFailed & too)
-		{
-			unreliable=1;
-			diagnostics<<too;
+        } catch (const LookingForAtgcMotifsMultinomialGibbs::TooMuchChainsFailed &too) {
+            unreliable = 1;
+            diagnostics<<too;
 			G=too.maxG;
 			if(!be_quiet) log_stream<<"TooMuchChainsFailed caught."<<endl<<the_state<<"G="<<G<<endl<<flush;
-		}
-		//DEBUG
+        }
+        //DEBUG
 
-		if (!at_least_one_succeeded && unreliable < 2) //we started
+        if (!at_least_one_succeeded && unreliable < 2) //we started
 		{
 			if (!be_quiet) log_stream<<"&&& First length was counted. The best was:\n"<<theState<<"with G="<<G<<endl<<endl;
 			MaxMCS=theState;
@@ -1393,13 +1346,14 @@ double LookingForAtgcMotifsMultinomialGibbs::find_maximum_slowly
 		//DEBUG
 		//cout<<"<p>@<p>"<<diagnostics<<"<p>@<p>"<<flush;
 	}
-	if (!at_least_one_succeeded) throw (* new SlowSearchFailed);
+    if (!at_least_one_succeeded)
+        throw SlowSearchFailed{};
 
-	the_state.SetLength(MaxMCS.pattern_length(),Sequences,current_caps_mode);
+    the_state.SetLength(MaxMCS.pattern_length(), Sequences, current_caps_mode);
 
-	the_state=MaxMCS;
+    the_state = MaxMCS;
 
-	Symbols=create_new_counter(Sequences,theState);
+    Symbols=create_new_counter(Sequences,theState);
 	//we are going to start sample the space with aStep() to anneal.
 	//We can realise that the annealing is
 	//over after cycles_with_minor_change_to_say_cold adjustments
@@ -1464,7 +1418,10 @@ void LookingForAtgcMotifsInOneThreadMultinomialGibbs::
 						motif_positions,
 						Y
 					);
-	} catch(DumbException de) {cerr<<de<<"\nExiting.\n";exit(1);}
+    } catch (const DumbException &de) {
+        cerr << de << "\nExiting.\n";
+        exit(1);
+    }
 #if __DEBUGLEVEL__ >= 3
 	log_stream<<"Outcome is "<<outcome<<endl;
 #endif
@@ -1543,7 +1500,10 @@ void LookingForAtgcMotifsInTwoThreadsMultinomialGibbs::
 						2*motif_positions+1,
 						Y
 					);
-	} catch(DumbException de) {cerr<<de<<"\nExiting.\n";exit(1);}
+    } catch (const DumbException &de) {
+        cerr << de << "\nExiting.\n";
+        exit(1);
+    }
 
 #if __DEBUGLEVEL__ >= 3
 	log_stream<<"Outcome is "<<outcome<<endl;
@@ -1641,7 +1601,10 @@ void LookingForAtgcPalindromesMultinomialGibbs::
 						motif_positions,
 						Y
 					);
-	} catch(DumbException de) {cerr<<de<<"\nExiting.\n";exit(1);}
+    } catch (const DumbException &de) {
+        cerr << de << "\nExiting.\n";
+        exit(1);
+    }
 #if __DEBUGLEVEL__ >= 3
 	log_stream<<"Outcome is "<<outcome<<endl;
 #endif
@@ -2036,11 +1999,8 @@ long double LookingForAtgcMotifsMultinomialGibbs::
 		if(!be_quiet) log_stream<<endl<<endl<<flush;
 	}
 	else
-		throw
-				(*new DumbException
-						("Contradictory state. All shifts are masked.\n")
-				);
-	return G;
+        throw DumbException("Contradictory state. All shifts are masked.\n");
+    return G;
 }
 
 
@@ -2091,17 +2051,12 @@ long double LookingForAtgcMotifsMultinomialGibbs::
 	}
 	if (actual_max_length<theState.pattern_length())
 	{
-		throw
-				(*new DumbException
-						("Contradictory state. Length is more than possible.\n")
-				);
-	}
+        throw DumbException("Contradictory state. Length is more than possible.\n");
+    }
 
-	MarkovChainState original_state(theState), optimal_state(theState),
-		state(theState);
+    MarkovChainState original_state(theState), optimal_state(theState), state(theState);
 
-
-	long double max_G=0,curr_G;
+    long double max_G=0,curr_G;
 
 	last_adjustment_has_changed_state=0;
 	//it's  useful if the minimal_length>maximal_length
@@ -2193,11 +2148,8 @@ long double LookingForAtgcMotifsMultinomialGibbs::
 		}
 	}
 	else
-		throw
-				(*new DumbException
-						("Contradictory state. All shifts are masked.\n")
-				);
-	/*if (orig_info>max_G) {
+        throw DumbException("Contradictory state. All shifts are masked.\n");
+    /*if (orig_info>max_G) {
 		SymbolsCounter * symb1=create_new_counter(Sequences,original_state),
 			*symb2=create_new_counter(Sequences,the_state);
 		symb1->calculate(original_state);
@@ -2208,7 +2160,7 @@ long double LookingForAtgcMotifsMultinomialGibbs::
 		delete symb1;
 		delete symb2;
 		exit(1);}*/
-	return max_G;
+    return max_G;
 }
 
 
@@ -2578,12 +2530,9 @@ unsigned int LookingForAtgcMotifsMultinomialGibbs::
 	//
 	if (i==most_possible_draw+1)
 	{
-		throw
-				(*new DumbException
-						("Trying to make draw more than the most possible.\n")
-				);
-	}
-	return i;
+        throw DumbException("Trying to make draw more than the most possible.\n");
+    }
+    return i;
 }
 
 double long LookingForAtgcMotifsMultinomialGibbs::

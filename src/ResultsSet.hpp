@@ -181,8 +181,10 @@ ostream & atgcstring::out35(ostream &o) const
 		char letterc;
 		try {
 			letterc=Atgc::complement(letter);
-		}	catch(AtgcException & a) {letterc=letter;}
-		o<<letterc;
+        } catch (const AtgcException &a) {
+            letterc = letter;
+        }
+        o<<letterc;
 	}
 	return o;
 }

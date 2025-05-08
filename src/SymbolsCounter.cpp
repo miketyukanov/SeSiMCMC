@@ -81,14 +81,12 @@ SymbolsCounter::SymbolsCounter
 	vector<unsigned int> counters(letters);  //sequence-wise counter
 
 	if(!Sequences.size())
-			throw
-					(*new DumbException("Trying to start counts from empty data set.\n"));
+        throw DumbException("Trying to start counts from empty data set.\n");
 
-	if (background.size()!=0 && background.size()!=4)
-			throw
-					(*new DumbException("The background is not 0 and not 4.\n"));
+    if (background.size()!=0 && background.size()!=4)
+        throw DumbException("The background is not 0 and not 4.\n");
 
-	if (background.size()==4) if_common_background=1;
+    if (background.size()==4) if_common_background=1;
 
 	for (SequencesPile::const_iterator seq=sp.begin();seq<sp.end();seq++)
 	{
